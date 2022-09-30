@@ -59,6 +59,18 @@ One or more statements should be enclosed in a code block using curly braces:
 }
 ```
 
+A lambda expression that takes no parameters requires empty parentheses:
+
+```java
+( ) -> { System.out.println("hello"); }
+```
+
+A lambda expression can provide parameter types, although they are unnecessary:
+
+```java
+(int i, int j) -> i + j
+```
+
 Since a lambda expression represents an unnamed function, how can we call it?
 
 In Java, we can assign a lambda expression to a variable. We can also pass a lambda expression into a method call,
@@ -147,7 +159,7 @@ public class QuestionOperator implements StringOperator {
 public class CapitalizeOperator implements StringOperator {
     @Override
     public String apply(String s) {
-        return s.isEmpty()? s : s.substring(0,1).toUpperCase() + s.substring(1);
+        return s.isEmpty() ? s : s.substring(0,1).toUpperCase() + s.substring(1);
     }
 }
 ```
@@ -176,7 +188,7 @@ Seriously?
 ```
 
 `QuestionOperator` and `CapitalizeOperator` provide the desired functionality; however,
-there is redundant code between the two.  The classes are identical except for (1) the class name, and (2) the method body.  
+there is redundant code between the two classes.  The classes are identical except for (1) the class name, and (2) the method body.  
 
 ```java
 public class NAME implements StringOperator {
@@ -196,10 +208,10 @@ The only thing we need for a lambda expression is the parameter and method body.
 A lambda expression can implement the `StringOperator` functional interface in a concise manner,
 avoiding the need to create extraneous classes.
 
-| Class Implementation                                                                                                                                     | Lambda Implementation                                                                        |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| public class QuestionOperator implements StringOperator {<br>&nbsp;&nbsp;@Override<br>&nbsp;&nbsp;public String apply(String s) { return s + "?"; }<br>} |                                                                                              |
-| StringOperator question = new QuestionOperator();<br>System.out.println(exclaim.apply("why")); //why?                                                    | StringOperator question = s -> s + "?";<br>System.out.println(question.apply("why")); //why? | 
+| Class Implementation                                                                                                                                     | Lambda Implementation                                                                          |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| public class QuestionOperator implements StringOperator {<br>&nbsp;&nbsp;@Override<br>&nbsp;&nbsp;public String apply(String s) { return s + "?"; }<br>} |                                                                                                |
+| StringOperator question = new QuestionOperator();<br>System.out.println( question.apply("why") ); //why?                                                 | StringOperator question = s -> s + "?";<br>System.out.println( question.apply("why") ); //why? | 
 
 
 We can avoid creating classes `QuestionOperator` and `CapitalizeOperator`, and simply
@@ -209,7 +221,7 @@ use a lambda expression to implement each function:
 public class Example5 {
     public static void main(String[] args) {
         StringOperator question = s -> s + "?";
-        StringOperator capitalize = s -> s.isEmpty()? s : s.substring(0,1).toUpperCase() + s.substring(1);
+        StringOperator capitalize = s -> s.isEmpty() ? s : s.substring(0,1).toUpperCase() + s.substring(1);
 
         System.out.println(question.apply("is it raining")); //is it raining?
         System.out.println(capitalize.apply("hello"));  //Hello
@@ -274,7 +286,7 @@ The table below points out some common errors when writing lambda expressions.
 | Erroneous Code                                                                | Explanation                                                                                          | Solution                                                                                           |
 |-------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | `MyFunction f =`<br>`  (a,b) -> { a + b };`                                   | A code block should contain<br>1 or more statements.<br>`a + b` is an expression<br>not a statement. | `MyFunction f =`<br>`(a,b) -> a + b;` <br>OR<br> `MyFunction f =`<br>`(a,b) -> {return a + b;};`   |
-| `MyFunction f =`<br>`  (s, t, u) -> s + t + u;`                               | lambda expression has <br>3 parameters,<br>`apply` method declares<br>2 parameters.                  | `MyFunction f =`<br>`(s, t) -> s + t`                                                              | 
+| `MyFunction f =`<br>`  (s, t, u) -> s + t + u;`                               | Lambda expression has <br>3 parameters,<br>`apply` method declares<br>2 parameters.                  | `MyFunction f =`<br>`(s, t) -> s + t`                                                              | 
 | `MyConsumer f =`<br>`  s -> System.out.println(s);`                           | `System.out.println`<br> statement must be<br>in a code block.                                       | `MyConsumer f =`<br>`s -> {System.out.println(s);};`                                               | 
 | `MyFunction f =`<br>`  (i,j) -> {System.out.println(i+j);};`                  | `System.out.println`<br>is a `void` function.<br>The `apply` function<br>return type is `int`.       | `MyFunction f =`<br>`(i,j) ->`<br>`{`<br>`  System.out.println(i+j);`<br>`  return i + j;`<br>`};` |
 | `MyConsumer f =`<br>`  s -> {System.out.println(s);}`<br><br>`f.apply("hi");` | `MyConsumer`<br>abstract method<br>is named `consume`,<br>not `apply`.                               | `MyConsumer f =`<br>`  s -> {System.out.println(s);}`<br><br>`f.consume("hi");`                    |
