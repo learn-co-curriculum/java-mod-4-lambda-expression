@@ -28,17 +28,17 @@ around**. Let’s take a deeper look at the bolded words:
 - **passed around** → Lambdas can be stored in variables and passed as arguments
   to other methods or lambdas.
 
-| Syntax                       | Example Lambda Expression                                                                                           |
-|------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| parameter -> expression      | `x -> x + 1`                                                                                                        |
-| (parameters) -> expression   | `(x , y) -> x * y`                                                                                                  |
-| (parameters) -> {statements} | `(x , y) -> {`<br>&nbsp;&nbsp;&nbsp;&nbsp;`System.out.println(x);`<br>&nbsp;&nbsp;&nbsp;&nbsp;`System.out.println(y);`<br>`}` |
+| Syntax                       | Example Lambda Expression                                                                                                      |
+|------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| parameter -> expression      | `x -> x + 1`                                                                                                                   |
+| (parameters) -> expression   | `(x , y) -> x * y`                                                                                                             |
+| (parameters) -> {statements} | `(x , y) -> {`<br>&nbsp;&nbsp;&nbsp;&nbsp;`System.out.println(x);`<br>&nbsp;&nbsp;&nbsp;&nbsp;`System.out.println(y);`<br>`}`  |
 
 The simplest lambda expression maps a single parameter to an expression.
 The parameter does not require a type declaration as the type will eventually be inferred (more on that below).
-The expression on the right hand side of the arrow should produce a value and
-should not be a statement (i.e. no variable declarations, assignments, conditionals, loops, etc).
-The value of the expression is automatically returned from the function, so an explicit return statement is unnecessary.
+An expression may consist of variables, operators, and method invocations that evaluate to a single value.
+The expression on the right hand side should not be a statement (i.e. no semi-colon, variable declarations, assignment statements, conditionals, loops, etc).
+The expression value is automatically returned from the function, so an explicit return statement is unnecessary.
 
 ```java
 x -> x + 1
@@ -62,7 +62,7 @@ One or more statements should be enclosed in a code block using curly braces:
 A lambda expression that takes no parameters requires empty parentheses:
 
 ```java
-( ) -> { System.out.println("hello"); }
+( ) -> System.out.println("hello")
 ```
 
 A lambda expression can provide parameter types, although they are unnecessary:
@@ -208,10 +208,10 @@ The only thing we need for a lambda expression is the parameter and method body.
 A lambda expression can implement the `StringOperator` functional interface in a concise manner,
 avoiding the need to create extraneous classes.
 
-| Class Implementation                                                                                                                                     | Lambda Implementation                                                                          |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| public class QuestionOperator implements StringOperator {<br>&nbsp;&nbsp;@Override<br>&nbsp;&nbsp;public String apply(String s) { return s + "?"; }<br>} |                                                                                                |
-| StringOperator question = new QuestionOperator();<br>System.out.println( question.apply("why") ); //why?                                                 | StringOperator question = s -> s + "?";<br>System.out.println( question.apply("why") ); //why? | 
+| Class Implementation                                                                                                                                     | Lambda Implementation                                                                   |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| public class QuestionOperator implements StringOperator {<br>&nbsp;&nbsp;@Override<br>&nbsp;&nbsp;public String apply(String s) { return s + "?"; }<br>} |                                                                                         |
+| StringOperator question = new QuestionOperator();<br>System.out.println( question.apply("why") );                                                        | StringOperator question = s -> s + "?";<br>System.out.println( question.apply("why") ); | 
 
 
 We can avoid creating classes `QuestionOperator` and `CapitalizeOperator`, and simply
@@ -283,15 +283,13 @@ interface MyConsumer {
 
 The table below points out some common errors when writing lambda expressions.
 
-| Erroneous Code                                                                | Explanation                                                                                          | Solution                                                                                           |
-|-------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| `MyFunction f =`<br>`  (a,b) -> { a + b };`                                   | A code block should contain<br>1 or more statements.<br>`a + b` is an expression<br>not a statement. | `MyFunction f =`<br>`(a,b) -> a + b;` <br>OR<br> `MyFunction f =`<br>`(a,b) -> {return a + b;};`   |
-| `MyFunction f =`<br>`  (s, t, u) -> s + t + u;`                               | Lambda expression has <br>3 parameters,<br>`apply` method declares<br>2 parameters.                  | `MyFunction f =`<br>`(s, t) -> s + t`                                                              | 
-| `MyConsumer f =`<br>`  s -> System.out.println(s);`                           | `System.out.println`<br> statement must be<br>in a code block.                                       | `MyConsumer f =`<br>`s -> {System.out.println(s);};`                                               | 
-| `MyFunction f =`<br>`  (i,j) -> {System.out.println(i+j);};`                  | `System.out.println`<br>is a `void` function.<br>The `apply` function<br>return type is `int`.       | `MyFunction f =`<br>`(i,j) ->`<br>`{`<br>`  System.out.println(i+j);`<br>`  return i + j;`<br>`};` |
-| `MyConsumer f =`<br>`  s -> {System.out.println(s);}`<br><br>`f.apply("hi");` | `MyConsumer`<br>abstract method<br>is named `consume`,<br>not `apply`.                               | `MyConsumer f =`<br>`  s -> {System.out.println(s);}`<br><br>`f.consume("hi");`                    |
-
-
+| Erroneous Code                                                              | Explanation                                                                                          | Solution                                                                                           |
+|-----------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `MyFunction f =`<br>`  (a,b) -> { a + b };`                                 | A code block should contain<br>1 or more statements.<br>`a + b` is an expression<br>not a statement. | `MyFunction f =`<br>`(a,b) -> a + b;` <br>OR<br> `MyFunction f =`<br>`(a,b) -> {return a + b;};`   |
+| `MyFunction f =`<br>`  (s, t, u) -> s + t + u;`                             | Lambda expression has 3<br>parameters, `apply` method<br> declares 2.                                | `MyFunction f =`<br>`(s, t) -> s + t`                                                              | 
+| `MyFunction f =`<br>`  (a,b) -> if (a<b) System.out.println(a);`            | Conditional statement must be<br>in a code block.                                                    | `MyFunction f =`<br>`(a,b) -> {if (a<b) System.out.println(a);}`                                   | 
+| `MyFunction f =`<br>`  (i,j) -> {System.out.println(i+j);};`                | `System.out.println`<br>is a `void` function.<br>The `apply` function<br>return type is `int`.       | `MyFunction f =`<br>`(i,j) ->`<br>`{`<br>`  System.out.println(i+j);`<br>`  return i + j;`<br>`};` |
+| `MyConsumer f =`<br>`  s -> System.out.println(s);`<br><br>`f.apply("hi");` | `MyConsumer`abstract method<br>is named `consume`,<br>not `apply`.                                   | `MyConsumer f =`<br>`  s -> System.out.println(s);`<br><br>`f.consume("hi");`                      |
 
 
 ## Summary
